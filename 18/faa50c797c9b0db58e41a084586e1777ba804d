@@ -1,0 +1,27 @@
+.github/APPROVED_CONTRIBUTORS
+  s_0eb68e45e95b2a::t_2aa36ddac5eaa3 1-76
+.github/MAINTAINERS
+  s_0eb68e45e95b2a::t_6eb2b98526f1ee 1-5
+.github/workflows/pr-gate.yml
+  s_0eb68e45e95b2a::t_81c39fbff828df 1-210
+.github/workflows/preview.yml
+  s_0eb68e45e95b2a::t_5d769a8f9ea3f5 1-540
+.github/workflows/release.yml
+  s_0eb68e45e95b2a::t_89aa41b5cd34b0 1-490
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "18faa50c797c9b0db58e41a084586e1777ba804d",
+  "prompts": {},
+  "sessions": {
+    "s_0eb68e45e95b2a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "055e213a-31f4-467d-b7b2-a3534338b557",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "unional <homawong@gmail.com>"
+    }
+  }
+}
