@@ -1,5 +1,11 @@
 # herdr
 
+> [!NOTE]
+> **This is drover, a fork of [herdr](https://github.com/herdrdev/herdr).**
+> drover is maintained by [cyberuni](https://github.com/cyberuni) and is not affiliated with or endorsed by the herdr project.
+> The rename to drover is in progress, so this README still describes upstream herdr and links to its docs, releases, and install channels.
+> Licensed under the [Apache License 2.0](LICENSE); see [NOTICE](NOTICE) for attribution.
+
 
 <p align="center">
   <img src="assets/logo.png" alt="herdr" width="100" />
