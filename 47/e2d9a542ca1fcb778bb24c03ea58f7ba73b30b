@@ -1,0 +1,21 @@
+NOTICE
+  s_0eb68e45e95b2a::t_f79d8a9e7af8e8 1-18
+README.md
+  s_0eb68e45e95b2a::t_e85b538ca5a46f 3-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "47e2d9a542ca1fcb778bb24c03ea58f7ba73b30b",
+  "prompts": {},
+  "sessions": {
+    "s_0eb68e45e95b2a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "055e213a-31f4-467d-b7b2-a3534338b557",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "unional <homawong@gmail.com>"
+    }
+  }
+}
