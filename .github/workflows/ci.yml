@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
   push:
-    branches: [master, windows]
+    branches: [main, windows]
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ env:
   ZIG_GLOBAL_CACHE_DIR: ${{ github.workspace }}/.zig-cache
   ZIG_LOCAL_CACHE_DIR: ${{ github.workspace }}/.zig-cache
   # PR caches are visible only to their own PR, and every save pushes the
-  # repository toward GitHub's cache limit, evicting the master caches PRs
+  # repository toward GitHub's cache limit, evicting the main caches PRs
   # restore from. Only branch pushes save.
   SAVE_CACHES: ${{ github.event_name == 'push' }}
 
@@ -28,7 +28,7 @@ concurrency:
 
 jobs:
   conventional-commits:
-    if: github.event_name != 'push' || github.ref_name == 'master'
+    if: github.event_name != 'push' || github.ref_name == 'main'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -355,3 +355,16 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             throw "Windows PowerShell installer test failed with exit code $LASTEXITCODE"
           }
+
+  # Single required status check for the branch ruleset, so adding or renaming
+  # jobs above does not require editing the ruleset. Added by drover.
+  all-checks:
+    needs: [conventional-commits, check, windows-conpty-package]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: All checks passed
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            exit 1
+          fi
