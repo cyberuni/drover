@@ -249,7 +249,7 @@ jobs:
         run: python3 scripts/changelog.py extract --version "${GITHUB_REF_NAME#v}" --output RELEASE_NOTES.md
 
       - name: Create release
-        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
         with:
           files: |
             herdr-linux-x86_64/herdr-linux-x86_64
