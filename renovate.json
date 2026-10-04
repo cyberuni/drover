@@ -4,6 +4,11 @@
 	"platformAutomerge": true,
 	"packageRules": [
 		{
+			"description": "bincode 3.0.0 is a compile_error! placeholder (https://xkcd.com/2347/) with no serde feature; stay on 2.x until a usable 3.x ships.",
+			"matchPackageNames": ["bincode"],
+			"allowedVersions": "<3"
+		},
+		{
 			"description": "Auto-merge non-major updates once all-checks passes. Majors stay manual.",
 			"matchUpdateTypes": ["minor", "patch", "pin", "digest"],
 			"automerge": true
