@@ -107,14 +107,28 @@ fn normalize_utf8_bom(content: &str) -> String {
     }
 
     let mut normalized = content.to_owned();
-    while let Err(error) = normalized.parse::<toml::Value>() {
+    while let Err(error) = normalized.parse::<toml::Table>() {
         let Some(span) = error.span() else {
             break;
         };
-        if normalized.get(span.clone()) != Some("\u{feff}") {
+        // The parser reports a line-start BOM either as the BOM itself or as an
+        // empty span right after it, where the BOM was taken as a key start.
+        let bom_range = if normalized.get(span.clone()) == Some("\u{feff}") {
+            span
+        } else if span.is_empty()
+            && span.start >= '\u{feff}'.len_utf8()
+            && normalized.get(span.start - '\u{feff}'.len_utf8()..span.start) == Some("\u{feff}")
+        {
+            span.start - '\u{feff}'.len_utf8()..span.start
+        } else {
+            break;
+        };
+        if !normalized[..bom_range.start].is_empty()
+            && !normalized[..bom_range.start].ends_with('\n')
+        {
             break;
         }
-        normalized.replace_range(span, "");
+        normalized.replace_range(bom_range, "");
     }
     normalized
 }
@@ -149,7 +163,7 @@ impl Config {
             }
         };
 
-        match deserialize_with_ignored::<Config, _>(toml::Deserializer::new(&content)) {
+        match toml::Deserializer::parse(&content).and_then(deserialize_with_ignored::<Config, _>) {
             Ok((config, ignored_keys)) => {
                 let (unknown_sections, mut diagnostics) =
                     unknown_top_level_sections_from_str(&content);
@@ -264,14 +278,9 @@ pub fn load_live_config() -> Result<LoadedConfig, Vec<String>> {
 
 fn load_live_config_from_str(content: &str) -> Result<LoadedConfig, Vec<String>> {
     let value = content
-        .parse::<toml::Value>()
+        .parse::<toml::Table>()
         .map_err(|err| vec![format!("config parse error: {err}; keeping current config")])?;
-    let table = value.as_table().ok_or_else(|| {
-        vec![
-            "config parse error: top-level config must be a table; keeping current config"
-                .to_string(),
-        ]
-    })?;
+    let table = &value;
 
     let mut config = Config::default();
     let mut diagnostics = unknown_top_level_section_diagnostics(table);
@@ -386,12 +395,10 @@ fn load_live_config_from_str(content: &str) -> Result<LoadedConfig, Vec<String>>
 }
 
 fn unknown_top_level_sections_from_str(content: &str) -> (Vec<String>, Vec<String>) {
-    let Ok(value) = content.parse::<toml::Value>() else {
+    let Ok(value) = content.parse::<toml::Table>() else {
         return (Vec::new(), Vec::new());
     };
-    let Some(table) = value.as_table() else {
-        return (Vec::new(), Vec::new());
-    };
+    let table = &value;
 
     let mut keys = Vec::new();
     let mut diagnostics = Vec::new();
@@ -1152,27 +1159,27 @@ mouse_capture = false
             normalized,
             "onboarding = false\n[terminal]\ndefault_shell = \"pwsh.exe\"\n"
         );
-        assert!(normalized.parse::<toml::Value>().is_ok());
+        assert!(normalized.parse::<toml::Table>().is_ok());
     }
 
     #[test]
     fn normalize_utf8_bom_preserves_boms_in_multiline_basic_strings() {
         let content = "[theme]\nname = \"\"\"\nfirst\n\u{feff}second\n\"\"\"\n";
-        assert!(content.parse::<toml::Value>().is_ok());
+        assert!(content.parse::<toml::Table>().is_ok());
         assert_eq!(normalize_utf8_bom(content), content);
     }
 
     #[test]
     fn normalize_utf8_bom_preserves_boms_in_multiline_literal_strings() {
         let content = "[theme]\nname = '''\nfirst\n\u{feff}second\n'''\n";
-        assert!(content.parse::<toml::Value>().is_ok());
+        assert!(content.parse::<toml::Table>().is_ok());
         assert_eq!(normalize_utf8_bom(content), content);
     }
 
     #[test]
     fn normalize_utf8_bom_preserves_string_boms_despite_other_errors() {
         let content = "[theme]\nname = \"\"\"\nfirst\n\u{feff}second\n\"\"\"\nbroken = \n";
-        assert!(content.parse::<toml::Value>().is_err());
+        assert!(content.parse::<toml::Table>().is_err());
         assert_eq!(normalize_utf8_bom(content), content);
     }
 

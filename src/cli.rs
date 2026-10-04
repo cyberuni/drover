@@ -175,7 +175,7 @@ fn channel_set(args: &[String]) -> std::io::Result<i32> {
     } else {
         String::new()
     };
-    if let Err(err) = content.parse::<toml::Value>() {
+    if let Err(err) = content.parse::<toml::Table>() {
         eprintln!(
             "config file at {} is invalid TOML: {err}. Fix it before changing the update channel.",
             path.display()
@@ -189,7 +189,7 @@ fn channel_set(args: &[String]) -> std::io::Result<i32> {
         "channel",
         &format!("\"{channel}\""),
     );
-    if let Err(err) = updated.parse::<toml::Value>() {
+    if let Err(err) = updated.parse::<toml::Table>() {
         eprintln!(
             "changing the update channel would make {} invalid TOML: {err}; leaving config unchanged",
             path.display()
@@ -328,7 +328,7 @@ fn config_reset_keys(args: &[String]) -> std::io::Result<i32> {
     }
 
     let content = std::fs::read_to_string(&path)?;
-    let parsed = match content.parse::<toml::Value>() {
+    let parsed = match content.parse::<toml::Table>() {
         Ok(value) => value,
         Err(err) => {
             eprintln!(
@@ -338,13 +338,7 @@ fn config_reset_keys(args: &[String]) -> std::io::Result<i32> {
             return Ok(1);
         }
     };
-    let Some(table) = parsed.as_table() else {
-        eprintln!(
-            "config file at {} is invalid TOML: top-level config must be a table.",
-            path.display()
-        );
-        return Ok(1);
-    };
+    let table = &parsed;
 
     if !table.contains_key("keys") {
         println!(
@@ -362,7 +356,7 @@ fn config_reset_keys(args: &[String]) -> std::io::Result<i32> {
         );
         return Ok(1);
     }
-    if let Err(err) = updated.parse::<toml::Value>() {
+    if let Err(err) = updated.parse::<toml::Table>() {
         eprintln!(
             "removing keybinding config would make {} invalid TOML: {err}; leaving config unchanged",
             path.display()
