@@ -274,7 +274,13 @@ mod tests {
                 "definitions": selected_definitions,
             });
             let bytes = serde_json::to_vec(&shape).expect("method shape json");
-            digests.insert(method.to_string(), format!("{:x}", Sha256::digest(bytes)));
+            digests.insert(
+                method.to_string(),
+                Sha256::digest(bytes)
+                    .iter()
+                    .map(|byte| format!("{byte:02x}"))
+                    .collect::<String>(),
+            );
         }
 
         digests
