@@ -1880,7 +1880,10 @@ mod tests {
 
     fn encoded_sha256(value: &impl Serialize) -> String {
         let encoded = bincode::serde::encode_to_vec(value, bincode::config::standard()).unwrap();
-        format!("{:x}", Sha256::digest(encoded))
+        Sha256::digest(encoded)
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect::<String>()
     }
 
     // These digests freeze representative generation-1 bincode payloads. A mismatch

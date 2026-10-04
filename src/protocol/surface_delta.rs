@@ -493,7 +493,10 @@ mod tests {
         let mut bytes = Vec::new();
         crate::protocol::write_message(&mut bytes, &update).unwrap();
         assert_eq!(
-            format!("{:x}", Sha256::digest(bytes)),
+            Sha256::digest(bytes)
+                .iter()
+                .map(|byte| format!("{byte:02x}"))
+                .collect::<String>(),
             "1effe2cbf998ff334bda9151995b87d54e646a1b90c10d853723d5bc1c8a84bf"
         );
     }

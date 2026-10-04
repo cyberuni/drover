@@ -539,7 +539,11 @@ pub(crate) fn shared_ssh_control_path(namespace: &Path, target: &str) -> std::io
     // %C additionally scopes the socket to OpenSSH's resolved destination,
     // port and jump host, rather than merely the spelling of an alias.
     // Keep 96 bits of namespace/target hash plus OpenSSH's 160-bit %C.
-    let hash = format!("{:x}", hash.finalize());
+    let hash: String = hash
+        .finalize()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect();
     let path = dir.join(format!("{}-%C", &hash[..24]));
     // OpenSSH first binds ControlPath + '.' + 16 random characters, then
     // renames it. Reserve those 17 bytes, not just the final socket's length.
