@@ -2230,8 +2230,10 @@ fn read_process_command_line(process: HANDLE) -> Option<String> {
         return None;
     }
     let units = buffer[string_offset..string_offset + length]
-        .chunks_exact(2)
-        .map(|unit| u16::from_ne_bytes([unit[0], unit[1]]))
+        .as_chunks::<2>()
+        .0
+        .iter()
+        .map(|unit| u16::from_ne_bytes(*unit))
         .collect::<Vec<_>>();
     String::from_utf16(&units)
         .ok()
@@ -3253,8 +3255,10 @@ mod tests {
             .decode(encoded)
             .unwrap();
         let utf16 = bytes
-            .chunks_exact(2)
-            .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|chunk| u16::from_le_bytes(*chunk))
             .collect::<Vec<_>>();
         assert_eq!(
             String::from_utf16(&utf16).unwrap(),
