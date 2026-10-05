@@ -377,7 +377,7 @@ mod tests {
         let mut decoder = png::Decoder::new(Cursor::new(bytes));
         decoder.set_transformations(png::Transformations::EXPAND | png::Transformations::STRIP_16);
         let mut reader = decoder.read_info().unwrap();
-        let mut output = vec![0_u8; reader.output_buffer_size()];
+        let mut output = vec![0_u8; reader.output_buffer_size().unwrap()];
         let info = reader.next_frame(&mut output).unwrap();
         output.truncate(info.buffer_size());
         output
